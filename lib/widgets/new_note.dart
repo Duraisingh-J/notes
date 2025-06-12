@@ -41,12 +41,20 @@ class _NewNote extends State<NewNote> {
       );
       return;
     }
-    widget.addNote(Note(title: _titlecontroller.text, content: _contentcontroller.text, time: DateTime.now()));
+    widget.addNote(
+      Note(
+        title: _titlecontroller.text,
+        content: _contentcontroller.text,
+        time: DateTime.now(),
+      ),
+    );
     Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = MediaQuery.of(context).platformBrightness ==
+        Brightness.dark;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 50, 16, 16),
       child: Column(
@@ -60,6 +68,11 @@ class _NewNote extends State<NewNote> {
               decoration: InputDecoration(
                 hintText: 'TITLE',
                 hintStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Theme.of(context).primaryColorDark,
+                  ),
+                ),
               ),
             ),
           ),
@@ -68,6 +81,7 @@ class _NewNote extends State<NewNote> {
             padding: EdgeInsets.all(5),
             decoration: BoxDecoration(
               border: Border.all(width: 1),
+              color: isDarkMode? Theme.of(context).primaryColor.withOpacity(0.2) : Theme.of(context).primaryColorLight,
               borderRadius: BorderRadius.circular(10),
             ),
             height: MediaQuery.of(context).size.height * 0.65,

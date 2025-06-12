@@ -3,7 +3,7 @@ import 'package:uuid/uuid.dart';
 
 const uuid = Uuid();
 
-final formatter = DateFormat('MM-EEE-yyyy hh:mm a');
+final formatter = DateFormat('dd-MM-yyyy hh:mm a');
 
 class Note {
   final String id;

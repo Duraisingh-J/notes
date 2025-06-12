@@ -3,6 +3,10 @@ import 'package:notes/models/note.dart';
 import 'package:notes/widgets/new_note.dart';
 import 'package:notes/widgets/notes_list.dart';
 
+//Todo: create a search bar and also the filter
+//      Enable the dark theme
+//      Customize the UI
+//      Delete option
 class NotesScreen extends StatefulWidget {
   const NotesScreen({super.key});
 
@@ -18,7 +22,12 @@ class _NotesScreen extends State<NotesScreen> {
       time: DateTime.now(),
     ),
     Note(title: 'Chemistry', content: 'Hybrid Bonding', time: DateTime.now()),
-    Note(title: 'Nature', content: 'Nature evokes a wide range of thoughts, from wonder and awe to concern and responsibility. People often associate nature with beauty, tranquility, and the interconnectedness of all living things. Others see nature as a source of wisdom, inspiration, and even spiritual guidance. However, there\'s also a growing awareness of the importance of protecting nature, recognizing its fragility and the impact of human activities', time: DateTime.now())
+    Note(
+      title: 'Nature',
+      content:
+          'Nature evokes a wide range of thoughts, from wonder and awe to concern and responsibility. People often associate nature with beauty, tranquility, and the interconnectedness of all living things. Others see nature as a source of wisdom, inspiration, and even spiritual guidance. However, there\'s also a growing awareness of the importance of protecting nature, recognizing its fragility and the impact of human activities',
+      time: DateTime.now(),
+    ),
   ];
 
   void _openToAddNote() {
@@ -41,6 +50,7 @@ class _NotesScreen extends State<NotesScreen> {
       appBar: AppBar(title: Text('Notes')),
       body: Column(
         children: [
+          SizedBox(height: 20,),
           Expanded(child: NotesList(notes)),
           Container(
             margin: EdgeInsets.all(10),
