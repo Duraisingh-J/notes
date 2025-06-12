@@ -14,15 +14,19 @@ class NotesList extends StatelessWidget {
     //     Notes(noteList[index])
     //   ,
     // );
-    return GridView.builder(
-      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 200,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-        childAspectRatio: 1,
+    return Container(
+      padding: EdgeInsets.all(10),
+      child: GridView.builder(
+        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 200,
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          childAspectRatio: 1,
+          
+        ),
+        itemCount: noteList.length,
+        itemBuilder: (context, index) => Notes(noteList[index]),
       ),
-      itemCount: noteList.length,
-      itemBuilder: (context, index) => Notes(noteList[index]),
     );
   }
 }

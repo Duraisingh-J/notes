@@ -55,7 +55,7 @@ class Notes extends StatelessWidget {
                 Divider(thickness: 2),
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: AutoSizeText(note.content, maxLines: 6),
+                  child: AutoSizeText(note.content, maxLines: 5),
                 ),
                 Spacer(),
                 Align(

@@ -41,7 +41,7 @@ void main() {
     theme: ThemeData().copyWith(
       appBarTheme: AppBarTheme(
         backgroundColor: kColorScheme.primary,
-        foregroundColor: kColorScheme.onSecondary,
+        foregroundColor: kColorScheme.onPrimary,
         titleTextStyle: TextStyle(fontSize: 25) 
       ),
       scaffoldBackgroundColor: kColorScheme.secondaryContainer,
@@ -54,8 +54,8 @@ void main() {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: kColorScheme.secondary,
-          foregroundColor: kColorScheme.onSecondary
+          backgroundColor: kColorScheme.primary,
+          foregroundColor: kColorScheme.onPrimary
         )
       ),
       textButtonTheme: TextButtonThemeData(

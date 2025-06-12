@@ -46,14 +46,17 @@ class _NotesScreen extends State<NotesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final navigationBarlength = MediaQuery.of(context).padding.bottom;
     return Scaffold(
       appBar: AppBar(title: Text('Notes')),
       body: Column(
         children: [
-          SizedBox(height: 20,),
+          SizedBox(height: 20),
           Expanded(child: NotesList(notes)),
           Container(
-            margin: EdgeInsets.all(10),
+            margin: navigationBarlength > 0
+                ? EdgeInsets.all(40)
+                : EdgeInsets.all(10),
             child: FloatingActionButton(
               onPressed: _openToAddNote,
               child: Icon(Icons.add),
