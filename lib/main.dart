@@ -3,7 +3,9 @@ import 'package:notes/widgets/notes_screen.dart';
 
 final kColorScheme = ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 40, 197, 218));
 
-final kDarkColorScheme = ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 40, 218, 168));
+final kDarkColorScheme = ColorScheme.fromSeed(
+ 
+  seedColor: const Color.fromARGB(255, 40, 218, 168));
 
 void main() {
   runApp(MaterialApp(
@@ -67,6 +69,10 @@ void main() {
       cardTheme: CardThemeData().copyWith(
         color: kColorScheme.primaryContainer
       ),
+
+      searchBarTheme: SearchBarThemeData().copyWith(
+
+      )
       
      
     ),

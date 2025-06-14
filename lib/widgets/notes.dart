@@ -4,14 +4,26 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:notes/models/note.dart';
 import 'package:notes/widgets/viewNote.dart';
 
+// ignore: must_be_immutable
 class Notes extends StatelessWidget {
   final Note note;
-  const Notes(this.note, {super.key});
+  void Function() loadNotes;
 
-  void viewNote(context) {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (_) => ViewNote(note)));
+  Notes(this.note, this.loadNotes, {super.key});
+
+  void viewNote(context) async {
+    final result = Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ViewNote(note, loadNotes
+          
+        ),
+      ),
+    );
+
+    // ignore: unrelated_type_equality_checks
+    if (result == true) {
+      loadNotes();
+    }
   }
 
   @override
@@ -28,11 +40,15 @@ class Notes extends StatelessWidget {
             gradient: LinearGradient(
               colors: [
                 // ignore: deprecated_member_use
-                isDarkMode ? Theme.of(context).primaryColorDark.withOpacity(0.3) : Theme.of(context).colorScheme.primary.withOpacity(0), 
+                isDarkMode
+                    ? Theme.of(context).primaryColorDark.withOpacity(0.3)
+                    : Theme.of(context).colorScheme.primary.withOpacity(0),
                 // ignore: deprecated_member_use
                 //Theme.of(context).colorScheme.primary.withOpacity(0.2),
                 // ignore: deprecated_member_use
-                isDarkMode? Theme.of(context).primaryColor.withOpacity(0.5) : Theme.of(context).colorScheme.primary.withOpacity(0.35),
+                isDarkMode
+                    ? Theme.of(context).primaryColor.withOpacity(0.5)
+                    : Theme.of(context).colorScheme.primary.withOpacity(0.35),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,

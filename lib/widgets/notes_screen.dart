@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:notes/database/db_helper.dart';
 import 'package:notes/models/note.dart';
 import 'package:notes/widgets/new_note.dart';
 import 'package:notes/widgets/notes_list.dart';
+import 'package:notes/widgets/search_screen.dart';
 
 //Todo: create a search bar and also the filter
-//      Enable the dark theme
 //      Customize the UI
 //      Delete option
 class NotesScreen extends StatefulWidget {
@@ -15,44 +16,105 @@ class NotesScreen extends StatefulWidget {
 }
 
 class _NotesScreen extends State<NotesScreen> {
-  List<Note> notes = [
-    Note(
-      title: 'Physics',
-      content: 'Gravitational Force',
-      time: DateTime.now(),
-    ),
-    Note(title: 'Chemistry', content: 'Hybrid Bonding', time: DateTime.now()),
-    Note(
-      title: 'Nature',
-      content:
-          'Nature evokes a wide range of thoughts, from wonder and awe to concern and responsibility. People often associate nature with beauty, tranquility, and the interconnectedness of all living things. Others see nature as a source of wisdom, inspiration, and even spiritual guidance. However, there\'s also a growing awareness of the importance of protecting nature, recognizing its fragility and the impact of human activities',
-      time: DateTime.now(),
-    ),
-  ];
+  List<Note>? _fetchedNotes;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotes();
+  }
+
+  void _loadNotes() async {
+    final noteMaps = await DBHelper().fetchNotes();
+    setState(() {
+      _fetchedNotes = noteMaps.map((map) => Note.fromMap(map)).toList();
+    });
+  }
 
   void _openToAddNote() {
     showModalBottomSheet(
+      useSafeArea: true,
       isScrollControlled: true,
       context: context,
-      builder: (ctx) => NewNote(_addNote),
+      builder: (ctx) => NewNote(_loadNotes),
     );
   }
 
-  void _addNote(Note note) {
-    setState(() {
-      notes.add(note);
-    });
+  void _removeNote(Note note) async {
+    await DBHelper().deleteNote(note);
+    _loadNotes();
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: Duration(seconds: 3),
+        content: Text("${note.title} is deleted"),
+        action: SnackBarAction(
+          onPressed: () async {
+            await DBHelper().insertNote(note);
+            _loadNotes();
+          },
+          label: "UNDO",
+        ),
+      ),
+    );
+  }
+
+  void _moveToSearchScreen() {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => SearchScreen(),
+        transitionDuration: Duration(microseconds: 300),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(1.0, 0.0);
+          const end = Offset.zero;
+          final tween = Tween(
+            begin: begin,
+            end: end,
+          ).chain(CurveTween(curve: Curves.ease));
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+          //return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    Widget noteList;
+    try {
+      if (_fetchedNotes == null) {
+        noteList = Center(child: CircularProgressIndicator());
+      } else if (_fetchedNotes!.isEmpty) {
+        noteList = Center(child: Text('No notes found'));
+      } else {
+        noteList = NotesList(_fetchedNotes!, _removeNote, _loadNotes);
+      }
+    } catch (e) {
+      noteList = Center(child: Text('Error: $e'));
+      print('$e');
+    }
     final navigationBarlength = MediaQuery.of(context).padding.bottom;
     return Scaffold(
       appBar: AppBar(title: Text('Notes')),
       body: Column(
         children: [
-          SizedBox(height: 20),
-          Expanded(child: NotesList(notes)),
+          SizedBox(height: 10),
+          Container(
+            padding: EdgeInsets.all(8),
+            child: InkWell(
+              onTap: _moveToSearchScreen,
+              child: AbsorbPointer(
+                child: SearchBar(hintText: 'Search your notes'),
+              ),
+            ),
+          ),
+          SizedBox(height: 15),
+          Expanded(child: noteList),
           Container(
             margin: navigationBarlength > 0
                 ? EdgeInsets.all(40)

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:notes/database/db_helper.dart';
 import 'package:notes/models/note.dart';
 
 // ignore: must_be_immutable
 class NewNote extends StatefulWidget {
-  void Function(Note) addNote;
+  void Function() addNote;
   NewNote(this.addNote, {super.key});
 
   @override
@@ -21,7 +22,7 @@ class _NewNote extends State<NewNote> {
     super.dispose();
   }
 
-  void _submitNote() {
+  Future<void> _submitNote() async {
     if (_titlecontroller.text.trim().isEmpty ||
         _contentcontroller.text.trim().isEmpty) {
       showDialog(
@@ -41,22 +42,46 @@ class _NewNote extends State<NewNote> {
       );
       return;
     }
-    widget.addNote(
-      Note(
-        title: _titlecontroller.text,
-        content: _contentcontroller.text,
-        time: DateTime.now(),
-      ),
+
+    final newNote = Note(
+      title: _titlecontroller.text.trim(),
+      content: _contentcontroller.text.trim(),
+      time: DateTime.now(),
     );
-    Navigator.pop(context);
+
+    try {
+      await DBHelper().insertNote(newNote);
+      widget.addNote();
+      Navigator.pop(context);
+    } catch (e) {
+      print("Insert error: $e");
+      if (context.mounted) {
+        showDialog(
+          // ignore: use_build_context_synchronously
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text("Error"),
+            content: Text("Could not save the note"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                },
+                child: Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = MediaQuery.of(context).platformBrightness ==
-        Brightness.dark;
+    final isDarkMode =
+        MediaQuery.of(context).platformBrightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 50, 16, 16),
+      padding: const EdgeInsets.fromLTRB(16, 30, 16, 16),
       child: Column(
         children: [
           SizedBox(
@@ -81,7 +106,9 @@ class _NewNote extends State<NewNote> {
             padding: EdgeInsets.all(5),
             decoration: BoxDecoration(
               border: Border.all(width: 1),
-              color: isDarkMode? Theme.of(context).primaryColor.withOpacity(0.2) : Theme.of(context).primaryColorLight,
+              color: isDarkMode
+                  ? Theme.of(context).primaryColor.withOpacity(0.2)
+                  : Theme.of(context).primaryColorLight,
               borderRadius: BorderRadius.circular(10),
             ),
             height: MediaQuery.of(context).size.height * 0.65,
