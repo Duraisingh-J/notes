@@ -17,6 +17,7 @@ class NotesScreen extends StatefulWidget {
 
 class _NotesScreen extends State<NotesScreen> {
   List<Note>? _fetchedNotes;
+  String filteredString = 'No Filter is applied...';
 
   @override
   void initState() {
@@ -64,7 +65,8 @@ class _NotesScreen extends State<NotesScreen> {
   void _moveToSearchScreen() {
     Navigator.of(context).push(
       PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => SearchScreen(),
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            SearchScreen(_fetchedNotes!, _loadNotes),
         transitionDuration: Duration(microseconds: 300),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           const begin = Offset(1.0, 0.0);
@@ -81,6 +83,25 @@ class _NotesScreen extends State<NotesScreen> {
         },
       ),
     );
+  }
+
+  void _seletedFilter(String value) async {
+    final noteMaps = value == 'A-z'
+        ? await DBHelper().fetchNotesbyAToZ()
+        : value == 'Z-A'
+        ? await DBHelper().fetchNotesbyZToA()
+        : value == 'datecurToprev'
+        ? await DBHelper().fetchNotesbyDateCurToPrev()
+        : await DBHelper().fetchNotesbyDatePrevToCur();
+
+    setState(() {
+      filteredString = value == 'A-z'
+          ? "Filtered by A-z"
+          : value == 'Z-A'
+          ? "Filtered by Z-A"
+          : "Filtered by date \nfrom previous to current";
+      _fetchedNotes = noteMaps.map((map) => Note.fromMap(map)).toList();
+    });
   }
 
   @override
@@ -101,30 +122,48 @@ class _NotesScreen extends State<NotesScreen> {
     final navigationBarlength = MediaQuery.of(context).padding.bottom;
     return Scaffold(
       appBar: AppBar(title: Text('Notes')),
-      body: Column(
-        children: [
-          SizedBox(height: 10),
-          Container(
-            padding: EdgeInsets.all(8),
-            child: InkWell(
-              onTap: _moveToSearchScreen,
-              child: AbsorbPointer(
-                child: SearchBar(hintText: 'Search your notes'),
+      body: SafeArea(
+        child: Column(
+          children: [
+            SizedBox(height: 10),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(width: 20),
+                Text(filteredString, style: TextStyle(fontSize: 20), ),
+                Spacer(),
+                PopupMenuButton(
+                  onSelected: (value) => _seletedFilter(value),
+                  icon: Icon(Icons.filter_list),
+                  itemBuilder: (context) => <PopupMenuEntry<String>>[
+                    PopupMenuItem(value: 'A-z', child: Text('Sort by A-z')),
+                    PopupMenuItem(value: 'Z-A', child: Text('Sort by Z-A')),
+                    PopupMenuItem(
+                      value: 'dateprevTocur',
+                      child: Text('Sort by date (prev - cur)'),
+                    ),
+                  ],
+                ),
+                IconButton(
+                  onPressed: _moveToSearchScreen,
+                  icon: Icon(Icons.search),
+                ),
+                SizedBox(width: 10),
+              ],
+            ),
+            SizedBox(height: 15),
+            Expanded(child: noteList),
+            Container(
+              margin: navigationBarlength > 0
+                  ? EdgeInsets.all(40)
+                  : EdgeInsets.all(10),
+              child: FloatingActionButton(
+                onPressed: _openToAddNote,
+                child: Icon(Icons.add),
               ),
             ),
-          ),
-          SizedBox(height: 15),
-          Expanded(child: noteList),
-          Container(
-            margin: navigationBarlength > 0
-                ? EdgeInsets.all(40)
-                : EdgeInsets.all(10),
-            child: FloatingActionButton(
-              onPressed: _openToAddNote,
-              child: Icon(Icons.add),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -61,10 +61,55 @@ class DBHelper {
     return notes;
   }
 
+  Future<List<Map<String, dynamic>>> fetchNotesbyAToZ() async {
+    final db = await database;
+    final List<Map<String, dynamic>> notes = (await db.query(
+      'notes',
+      orderBy: 'title ASC',
+    )).cast<Map<String, dynamic>>();
+    return notes;
+  }
+
+  Future<List<Map<String, dynamic>>> fetchNotesbyZToA() async {
+    final db = await database;
+    final List<Map<String, dynamic>> notes = (await db.query(
+      'notes',
+      orderBy: 'title DESC',
+    )).cast<Map<String, dynamic>>();
+    return notes;
+  }
+
+   Future<List<Map<String, dynamic>>> fetchNotesbyDateCurToPrev() async {
+    final db = await database;
+    final List<Map<String, dynamic>> notes = (await db.query(
+      'notes',
+      orderBy: 'timestamp DESC',
+    )).cast<Map<String, dynamic>>();
+    return notes;
+  }
+
+   Future<List<Map<String, dynamic>>> fetchNotesbyDatePrevToCur() async {
+    final db = await database;
+    final List<Map<String, dynamic>> notes = (await db.query(
+      'notes',
+      orderBy: 'timestamp ASC',
+    )).cast<Map<String, dynamic>>();
+    return notes;
+  }
+
+  
+
+  
+
   Future<void> updateNote(Note note) async {
     final db = await database;
 
-    await db.update('notes', note.toMap(), where: 'id = ?', whereArgs: [note.id]);
+    await db.update(
+      'notes',
+      note.toMap(),
+      where: 'id = ?',
+      whereArgs: [note.id],
+    );
   }
 
   Future<void> deleteNote(Note note) async {
