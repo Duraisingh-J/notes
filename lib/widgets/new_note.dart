@@ -78,74 +78,81 @@ class _NewNote extends State<NewNote> {
 
   @override
   Widget build(BuildContext context) {
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
     final isDarkMode =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 30, 16, 16),
-      child: Column(
-        children: [
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.12,
-            child: TextField(
-              controller: _titlecontroller,
-              maxLines: null,
-              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-              decoration: InputDecoration(
-                hintText: 'TITLE',
-                hintStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Theme.of(context).primaryColorDark,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.12,
+              child: TextField(
+                controller: _titlecontroller,
+                maxLines: null,
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                decoration: InputDecoration(
+                  hintText: 'TITLE',
+                  hintStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Theme.of(context).primaryColorDark,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          SizedBox(height: 10),
-          Container(
-            padding: EdgeInsets.all(5),
-            decoration: BoxDecoration(
-              border: Border.all(width: 1),
-              color: isDarkMode
-                  ? Theme.of(context).primaryColor.withOpacity(0.2)
-                  : Theme.of(context).primaryColorLight,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            height: MediaQuery.of(context).size.height * 0.65,
-            child: TextField(
-              controller: _contentcontroller,
-              style: TextStyle(fontSize: 20),
-              maxLines: null,
-              decoration: InputDecoration(
-                hintText: 'Type your note...',
-                hintStyle: TextStyle(fontSize: 15),
-                border: InputBorder.none,
-
-                // enabledBorder: OutlineInputBorder(
-                //   borderSide: BorderSide(width: 1),
-                // ),
-                // focusedBorder: OutlineInputBorder(
-                //   borderSide: BorderSide(width: 2),
-                // ),
+            SizedBox(height: 10),
+            Container(
+              padding: EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                border: Border.all(width: 1),
+                color: isDarkMode
+                    // ignore: deprecated_member_use
+                    ? Theme.of(context).primaryColor.withOpacity(0.2)
+                    : Theme.of(context).primaryColorLight,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              height: isPortrait
+                  ? MediaQuery.of(context).size.height * 0.65
+                  : MediaQuery.of(context).size.height * 0.48,
+              child: TextField(
+                controller: _contentcontroller,
+                style: TextStyle(fontSize: 20),
+                maxLines: null,
+                decoration: InputDecoration(
+                  hintText: 'Type your note...',
+                  hintStyle: TextStyle(fontSize: 15),
+                  border: InputBorder.none,
+        
+                  // enabledBorder: OutlineInputBorder(
+                  //   borderSide: BorderSide(width: 1),
+                  // ),
+                  // focusedBorder: OutlineInputBorder(
+                  //   borderSide: BorderSide(width: 2),
+                  // ),
+                ),
               ),
             ),
-          ),
-          SizedBox(height: 20),
-
-          Row(
-            children: [
-              Spacer(),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text('Cancel'),
-              ),
-              SizedBox(width: 10),
-              ElevatedButton(onPressed: _submitNote, child: Text('Add')),
-            ],
-          ),
-        ],
+            SizedBox(height: 20),
+        
+            Row(
+              children: [
+                Spacer(),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('Cancel'),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(onPressed: _submitNote, child: Text('Add')),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

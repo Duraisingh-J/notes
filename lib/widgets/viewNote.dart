@@ -56,121 +56,91 @@ class _ViewNote extends State<ViewNote> {
   }
 
   Widget editNote() {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 50, 10, 10),
-        child: Column(
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.12,
-              child: TextField(
-                enabled: true,
-
-                autofocus: true,
-
-                controller: _titleEditor,
-                maxLines: null,
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                decoration: InputDecoration(
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Theme.of(context).primaryColorDark,
+    return SafeArea(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+          final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+          return Padding(
+            padding: EdgeInsets.all(10),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.12,
+                  child: TextField(
+                    enabled: true,
+                    autofocus: true,
+                    controller: _titleEditor,
+                    maxLines: null,
+                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                    decoration: InputDecoration(
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Theme.of(context).primaryColorDark,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.all(5),
+                Container(
+                  padding: EdgeInsets.all(5),
+                  height: isPortrait? MediaQuery.of(context).size.height * 0.65 : MediaQuery.of(context).size.height * 0.50,
+                  child: TextField(
+                    controller: _contentEditor,
+                    style: TextStyle(fontSize: 20),
+                    maxLines: null,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
 
-              height: MediaQuery.of(context).size.height * 0.65,
-              child: TextField(
-                controller: _contentEditor,
-                style: TextStyle(fontSize: 20),
-                maxLines: null,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-
-                  // enabledBorder: OutlineInputBorder(
-                  //   borderSide: BorderSide(width: 1),
-                  // ),
-                  // focusedBorder: OutlineInputBorder(
-                  //   borderSide: BorderSide(width: 2),
-                  // ),
+                      // enabledBorder: OutlineInputBorder(
+                      //   borderSide: BorderSide(width: 1),
+                      // ),
+                      // focusedBorder: OutlineInputBorder(
+                      //   borderSide: BorderSide(width: 2),
+                      // ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            SizedBox(height: 20),
+                SizedBox(height: 20),
 
-            Row(
-              children: [
-                Spacer(),
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      isEditable = false;
-                    });
-                  },
-                  child: Text('Cancel'),
-                ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    updateNote();
-                    widget.loadNotes();
-                  },
-                  child: Text('Save Changes'),
+                Padding(
+                  padding: EdgeInsets.only(bottom : bottomInset),
+                  child: Row(
+                    children: [
+                      Spacer(),
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            isEditable = false;
+                          });
+                        },
+                        child: Text('Cancel'),
+                      ),
+                      SizedBox(width: 10),
+                      ElevatedButton(
+                        onPressed: () {
+                          updateNote();
+                          widget.loadNotes();
+                        },
+                        child: Text('Save Changes'),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget nonEditableNote() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          SizedBox(height: 70),
-          Align(
-            alignment: Alignment.topLeft,
-            child: Text(widget.note.title, style: TextStyle(fontSize: 35)),
-          ),
-          Divider(thickness: 2),
-          Align(
-            alignment: Alignment.topLeft,
-            child: Text(
-              widget.note.formattedTime.toString(),
-              style: TextStyle(fontSize: 15),
-            ),
-          ),
-          SizedBox(height: 30),
-          SingleChildScrollView(
-            child: Text(
-              widget.note.content,
-              style: TextStyle(fontSize: 20),
-              textAlign: TextAlign.justify,
-            ),
-          ),
-          Spacer(),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                isEditable = true;
-              });
-            },
-            child: Text('Edit'),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+
     // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async {
@@ -211,7 +181,46 @@ class _ViewNote extends State<ViewNote> {
         resizeToAvoidBottomInset: true,
         body: Padding(
           padding: const EdgeInsets.all(12),
-          child: isEditable ? editNote() : nonEditableNote(),
+          child: isEditable
+              ? editNote()
+              : SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                      children: [
+                        SizedBox(height: isPortrait ? 30 : 20),
+                        Text(widget.note.title, style: TextStyle(fontSize: 35)),
+                        Divider(thickness: 2),
+                        Text(
+                          widget.note.formattedTime.toString(),
+                          style: TextStyle(fontSize: 15),
+                        ),
+                        SizedBox(height: 30),
+                        SingleChildScrollView(
+                          child: Text(
+                            widget.note.content,
+                            style: TextStyle(fontSize: 20),
+
+                            textAlign: widget.note.content.length > 5
+                                ? TextAlign.justify
+                                : TextAlign.start,
+                          ),
+                        ),
+                        Spacer(),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              isEditable = true;
+                            });
+                          },
+                          child: Text('Edit'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
         ),
       ),
     );

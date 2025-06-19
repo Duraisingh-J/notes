@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:notes/models/note.dart';
 import 'package:notes/widgets/notes.dart';
-import 'package:path/path.dart';
 
+// ignore: must_be_immutable
 class SearchScreen extends StatefulWidget {
   final List<Note> fetchedNotes;
   void Function() loadNotes;
