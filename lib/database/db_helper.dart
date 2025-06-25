@@ -47,8 +47,10 @@ class DBHelper {
 
     final results = await db.query('notes');
 
+    // ignore: avoid_print
     print("Fetched ${results.length} notes");
     for (var result in results) {
+      // ignore: avoid_print
       print(result);
     }
   }

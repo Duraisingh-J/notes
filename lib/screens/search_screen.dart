@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:notes/models/note.dart';
+import 'package:notes/provider/data_provider.dart';
 import 'package:notes/widgets/notes.dart';
 
 // ignore: must_be_immutable
-class SearchScreen extends StatefulWidget {
-  final List<Note> fetchedNotes;
-  void Function() loadNotes;
-
-  SearchScreen(this.fetchedNotes, this.loadNotes, {super.key});
+class SearchScreen extends ConsumerStatefulWidget {
+  const SearchScreen({super.key});
 
   @override
-  State<SearchScreen> createState() => _SearchScreen();
+  ConsumerState<SearchScreen> createState() => _SearchScreen();
 }
 
-class _SearchScreen extends State<SearchScreen> {
+class _SearchScreen extends ConsumerState<SearchScreen> {
   final TextEditingController _inputController = TextEditingController();
-
+  // ignore: prefer_typing_uninitialized_variables
+  List<Note>? fetchedNotes;
   List<Note> filteredNotes = [];
 
   @override
   void initState() {
     super.initState();
+    fetchedNotes = [];
     filteredNotes = [];
     _inputController.addListener(_searchingNotes);
   }
@@ -29,7 +30,7 @@ class _SearchScreen extends State<SearchScreen> {
     final query = _inputController.text.toLowerCase();
 
     setState(() {
-      filteredNotes = widget.fetchedNotes
+      filteredNotes = fetchedNotes!
           .where((item) => item.title.toLowerCase().contains(query))
           .toList();
     });
@@ -43,8 +44,10 @@ class _SearchScreen extends State<SearchScreen> {
 
   @override
   Widget build(context) {
+    fetchedNotes = ref.watch(dataProvider);
     final isDarkMode =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.fromLTRB(15, 5, 15, 15),
@@ -95,7 +98,7 @@ class _SearchScreen extends State<SearchScreen> {
                         ),
                         itemCount: filteredNotes.length,
                         itemBuilder: (context, index) =>
-                            Notes(filteredNotes[index], widget.loadNotes),
+                            Notes(filteredNotes[index]),
                       ),
                     ),
             ],

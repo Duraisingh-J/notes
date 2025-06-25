@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:notes/database/db_helper.dart';
 import 'package:notes/models/note.dart';
+import 'package:notes/provider/data_provider.dart';
 
 // ignore: must_be_immutable
-class NewNote extends StatefulWidget {
-  void Function() addNote;
-  NewNote(this.addNote, {super.key});
+class NewNote extends ConsumerStatefulWidget {
+  const NewNote({super.key});
 
   @override
-  State<StatefulWidget> createState() => _NewNote();
+  ConsumerState<NewNote> createState() => _NewNote();
 }
 
-class _NewNote extends State<NewNote> {
+class _NewNote extends ConsumerState<NewNote> {
   final _titlecontroller = TextEditingController();
   final _contentcontroller = TextEditingController();
 
@@ -51,7 +52,7 @@ class _NewNote extends State<NewNote> {
 
     try {
       await DBHelper().insertNote(newNote);
-      widget.addNote();
+      ref.read(dataProvider.notifier).addNote(newNote);
       Navigator.pop(context);
     } catch (e) {
       print("Insert error: $e");
@@ -95,7 +96,10 @@ class _NewNote extends State<NewNote> {
                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                 decoration: InputDecoration(
                   hintText: 'TITLE',
-                  hintStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  hintStyle: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                   focusedBorder: UnderlineInputBorder(
                     borderSide: BorderSide(
                       color: Theme.of(context).primaryColorDark,
@@ -126,7 +130,7 @@ class _NewNote extends State<NewNote> {
                   hintText: 'Type your note...',
                   hintStyle: TextStyle(fontSize: 15),
                   border: InputBorder.none,
-        
+
                   // enabledBorder: OutlineInputBorder(
                   //   borderSide: BorderSide(width: 1),
                   // ),
@@ -137,7 +141,7 @@ class _NewNote extends State<NewNote> {
               ),
             ),
             SizedBox(height: 20),
-        
+
             Row(
               children: [
                 Spacer(),

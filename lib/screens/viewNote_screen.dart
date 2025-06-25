@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:notes/database/db_helper.dart';
 import 'package:notes/models/note.dart';
+import 'package:notes/provider/data_provider.dart';
 
-class ViewNote extends StatefulWidget {
-  final Note note;
-  final Function() loadNotes;
-  const ViewNote(this.note, this.loadNotes, {super.key});
+class ViewNoteScreen extends ConsumerStatefulWidget {
+  Note note;
+  ViewNoteScreen(this.note, {super.key});
 
   @override
-  State<ViewNote> createState() => _ViewNote();
+  ConsumerState<ViewNoteScreen> createState() => _ViewNote();
 }
 
-class _ViewNote extends State<ViewNote> {
+class _ViewNote extends ConsumerState<ViewNoteScreen> {
   bool isEditable = false;
 
   late TextEditingController _titleEditor;
@@ -33,80 +34,84 @@ class _ViewNote extends State<ViewNote> {
   }
 
   void updateNote() async {
-    await DBHelper().updateNote(
-      Note.withId(
-        id: widget.note.id,
-        title: _titleEditor.text,
-        content: _contentEditor.text,
-        time: DateTime.now(),
-      ),
+    final updatedNote = Note.withId(
+      id: widget.note.id,
+      title: _titleEditor.text,
+      content: _contentEditor.text,
+      time: DateTime.now(),
     );
+    await DBHelper().updateNote(updatedNote);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         duration: Duration(seconds: 1),
         content: Text('Note is modified'),
       ),
     );
+   
+    ref.read(dataProvider.notifier).updateNote(updatedNote);
     setState(() {
-      widget.note.title = _titleEditor.text;
-      widget.note.content = _contentEditor.text;
-      widget.note.time = DateTime.now();
+       widget.note = updatedNote;
       isEditable = false;
     });
   }
 
   Widget editNote() {
     return SafeArea(
-      child: LayoutBuilder(
+      child: 
+      LayoutBuilder(
         builder: (context, constraints) {
           final bottomInset = MediaQuery.of(context).viewInsets.bottom;
           final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
-          return Padding(
-            padding: EdgeInsets.all(10),
-            child: Column(
-              children: [
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.12,
-                  child: TextField(
-                    enabled: true,
-                    autofocus: true,
-                    controller: _titleEditor,
-                    maxLines: null,
-                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                    decoration: InputDecoration(
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Theme.of(context).primaryColorDark,
+              MediaQuery.of(context).orientation == Orientation.portrait;
+          return SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.only(bottom: bottomInset),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.12,
+                    child: TextField(
+                      cursorColor: Colors.black,
+                      enabled: true,
+                      autofocus: true,
+                      controller: _titleEditor,
+                      maxLines: null,
+                      style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                      decoration: InputDecoration(
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Theme.of(context).primaryColorDark,
+                          ),
                         ),
+                        
                       ),
                     ),
                   ),
-                ),
-                Container(
-                  padding: EdgeInsets.all(5),
-                  height: isPortrait? MediaQuery.of(context).size.height * 0.65 : MediaQuery.of(context).size.height * 0.50,
-                  child: TextField(
-                    controller: _contentEditor,
-                    style: TextStyle(fontSize: 20),
-                    maxLines: null,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-
-                      // enabledBorder: OutlineInputBorder(
-                      //   borderSide: BorderSide(width: 1),
-                      // ),
-                      // focusedBorder: OutlineInputBorder(
-                      //   borderSide: BorderSide(width: 2),
-                      // ),
+                  Container(
+                    padding: EdgeInsets.all(5),
+                    height: isPortrait
+                        ? MediaQuery.of(context).size.height * 0.65
+                        : MediaQuery.of(context).size.height * 0.50,
+                    child: TextField(
+                      cursorColor: Colors.black,
+                      controller: _contentEditor,
+                      style: TextStyle(fontSize: 20),
+                      maxLines: null,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+            
+                        // enabledBorder: OutlineInputBorder(
+                        //   borderSide: BorderSide(width: 1),
+                        // ),
+                        // focusedBorder: OutlineInputBorder(
+                        //   borderSide: BorderSide(width: 2),
+                        // ),
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: 20),
-
-                Padding(
-                  padding: EdgeInsets.only(bottom : bottomInset),
-                  child: Row(
+                  SizedBox(height: 20),
+            
+                  Row(
                     children: [
                       Spacer(),
                       TextButton(
@@ -121,14 +126,13 @@ class _ViewNote extends State<ViewNote> {
                       ElevatedButton(
                         onPressed: () {
                           updateNote();
-                          widget.loadNotes();
                         },
                         child: Text('Save Changes'),
                       ),
                     ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
@@ -163,7 +167,6 @@ class _ViewNote extends State<ViewNote> {
                         isEditable = false;
                       });
                       Navigator.of(ctx).pop(true);
-                      widget.loadNotes();
                     },
                     child: Text(
                       'Discard Changes',

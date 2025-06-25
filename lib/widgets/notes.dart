@@ -2,28 +2,22 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:notes/models/note.dart';
-import 'package:notes/widgets/viewNote.dart';
+import 'package:notes/screens/viewNote_screen.dart';
 
 // ignore: must_be_immutable
 class Notes extends StatelessWidget {
   final Note note;
-  void Function() loadNotes;
 
-  Notes(this.note, this.loadNotes, {super.key});
+  const Notes(this.note, {super.key});
 
   void viewNote(context) async {
-    final result = Navigator.of(context).push(
+    Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ViewNote(note, loadNotes
-          
-        ),
+        builder: (context) => ViewNoteScreen(note),
       ),
     );
 
-    // ignore: unrelated_type_equality_checks
-    if (result == true) {
-      loadNotes();
-    }
+    
   }
 
   @override

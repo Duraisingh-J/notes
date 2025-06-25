@@ -6,8 +6,7 @@ import 'package:notes/widgets/notes.dart';
 class NotesList extends StatelessWidget {
   final List<Note> noteList;
   final Function(Note) removeNote;
-  void Function() loadNotes;
-  NotesList(this.noteList, this.removeNote, this.loadNotes, {super.key});
+  const NotesList(this.noteList, this.removeNote, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +32,7 @@ class NotesList extends StatelessWidget {
             onDismissed: (direction) {
               removeNote(noteList[index]);
             },
-            child: Notes(noteList[index], loadNotes),
+            child: Notes(noteList[index]),
           ),
         ),
       ),
