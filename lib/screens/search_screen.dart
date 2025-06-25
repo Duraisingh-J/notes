@@ -80,6 +80,9 @@ class _SearchScreen extends ConsumerState<SearchScreen> {
                             Text('Type here to search notes....'),
                           ],
                         ),
+                        focusedBorder: UnderlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black)
+                        )
                       ),
                     ),
                   ),
